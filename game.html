@@ -75,6 +75,7 @@
 	  padding: 4px 10px;
 	  border-radius: 4px;
     }
+	
     button:disabled{ opacity:.45; cursor:not-allowed; }
 
     #statusSmall{
@@ -200,13 +201,11 @@
       letter-spacing: .2px;
       min-height: 1.1em;
     }
-    #bigStatus.danger .main{
+    #bigStatus.danger{
 	color: #ffd6d6;
       background: rgba(120,0,0,.58);
       border-color: rgba(255,120,120,1);
-	    text-shadow:
-    0 0 12px rgba(255,80,80,.6),
-    0 0 30px rgba(255,0,0,.35);
+	
     }
 
     /* ELIMINATED overlay (non-interactable, map still pans) */
@@ -235,7 +234,7 @@
     #elimOverlay .small{
       margin-top: 8px;
       font-size: clamp(14px, 3.3vw, 18px);
-      color: rgba(255, 255, 255, .85);
+      color: rgba(255, 255, 255, 1);
       letter-spacing: .4px;
       line-height: 1.25;
     }
@@ -244,7 +243,7 @@
 	  display: block;
 	  margin-top: 6px;
 	  font-size: 0.9em;
-	  opacity: .75;
+	  opacity: 1;
 	}
 
     #elimFrame{
@@ -300,9 +299,9 @@
 
   <!-- Host-only controls -->
   <div id="panel" class="hidden">
-    <h2>Host Controls</h2>
+    <h2>Host Settings</h2>
     <div class="note">
-      The safe zone shrinks until it closes. Guests never see these controls.
+      Game settings. (Hint: Try it yourself before playing.)
     </div>
 
     <div class="row">
@@ -311,12 +310,12 @@
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Delay before storm (s)</div><div class="val" id="v_delay"></div></div>
+      <div class="rowHeader"><div class="label">Time before game starts (s)</div><div class="val" id="v_delay"></div></div>
       <input id="delaySec" type="range" min="0" max="600" step="10" value="60" />
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Rest time (s)</div><div class="val" id="v_hold"></div></div>
+      <div class="rowHeader"><div class="label">Rest time between storm shrinkage (s)</div><div class="val" id="v_hold"></div></div>
       <input id="holdTime" type="range" min="0" max="180" step="5" value="20" />
     </div>
 
@@ -326,8 +325,8 @@
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Damage per second</div><div class="val" id="v_dps"></div></div>
-      <input id="dps" type="range" min="1" max="30" step="1" value="6" />
+      <div class="rowHeader"><div class="label">Storm damage per second</div><div class="val" id="v_dps"></div></div>
+      <input id="dps" type="range" min="1" max="30" step="1" value="3" />
     </div>
 
 
@@ -342,8 +341,9 @@
   <button id="shareBtn" class="secondary" disabled>Share Game</button>
 </div>
 
-  <button id="hideUiBtn" class="hidebutton">Hide this menu</button>
+
 <div class="btnRow">
+  <button id="hideUiBtn" class="hidebutton">Hide this menu</button>
 </div>
 
     <div id="statusSmall"></div>
@@ -379,6 +379,11 @@
     // ============================================================
     // Hash params
     // ============================================================
+	
+	  function pickupStorageKey(st){
+    return `stormcatch_pickups_${st.seed}_${st.startedAtMs}`;
+  }
+	
     function parseHashParams() {
       const h = (location.hash || "").replace(/^#/, "").trim();
       const out = {};
@@ -921,6 +926,16 @@
 
       activeState.circles = buildSeededCircles(activeState);
       activeState.pickups = buildSeededPickups(activeState);
+	  
+	  // Restore locally collected pickups for this game
+	try {
+	  const key = pickupStorageKey(activeState);
+	  const saved = JSON.parse(localStorage.getItem(key) || "[]");
+	  collectedPickupIds = new Set(saved);
+	} catch {
+	  collectedPickupIds = new Set();
+	}
+	  
 
       map.setView([baseCenter.lat, baseCenter.lng], 14);
       drawStorm(baseCenter, baseRadiusM);
@@ -1039,6 +1054,12 @@
       statusSmall.textContent = "Reset. Tap the map to pick a new center.";
 
       setBigStatus("Waiting…", "", false);
+	  
+	  if (activeState) {
+		  try {
+			localStorage.removeItem(pickupStorageKey(activeState));
+		  } catch {}
+		}
     };
 
     // ============================================================
