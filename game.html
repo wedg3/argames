@@ -80,7 +80,7 @@
     #statusSmall{
       margin-top: 8px;
       font-size: 12px;
-      color: #111;
+      color: #000;
       line-height: 1.35;
       white-space: pre-wrap;
       opacity: .9;
@@ -115,13 +115,14 @@
     #pickOverlay .bubble b{ font-weight: 1000; }
 
     /* Host "Show UI" button wrapper (host-only) */
-    #showUiWrap{
-      position:fixed;
-      left:10px;
-      bottom:10px;
-      z-index:1200;
-      display:none;
-    }
+#showUiWrap{
+  position: fixed;
+  left: 50%;
+  bottom: calc(170px + env(safe-area-inset-bottom)); /* slightly above bigStatus */
+  transform: translateX(-50%);
+  z-index: 1200;
+  display: none;
+}
     #showUiBtn{
       padding:10px 12px;
       border-radius: 14px;
@@ -200,9 +201,13 @@
       letter-spacing: .2px;
       min-height: 1.1em;
     }
-    #bigStatus.danger{
-      background: rgba(120,0,0,.28);
-      border-color: rgba(255,120,120,.55);
+    #bigStatus.danger .main{
+	color: #ffd6d6;
+      background: rgba(120,0,0,.58);
+      border-color: rgba(255,120,120,1);
+	    text-shadow:
+    0 0 12px rgba(255,80,80,.6),
+    0 0 30px rgba(255,0,0,.35);
     }
 
     /* ELIMINATED overlay (non-interactable, map still pans) */
@@ -225,16 +230,23 @@
       font-size: clamp(34px, 8vw, 68px);
       font-weight: 1000;
       letter-spacing: 1px;
-      color: rgba(255, 60, 60, .35);
+      color: rgba(255, 60, 60, .50);
       text-shadow: 0 10px 40px rgba(0,0,0,.35);
     }
     #elimOverlay .small{
       margin-top: 8px;
       font-size: clamp(14px, 3.3vw, 18px);
-      color: rgba(255, 255, 255, .35);
+      color: rgba(255, 255, 255, .85);
       letter-spacing: .4px;
       line-height: 1.25;
     }
+	
+	#elimOverlay .elimTime{
+	  display: block;
+	  margin-top: 6px;
+	  font-size: 0.9em;
+	  opacity: .75;
+	}
 
     #elimFrame{
       position: fixed;
@@ -245,6 +257,7 @@
       border: 6px solid rgba(255, 50, 50, .55);
       border-radius: 18px;
     }
+	
 
     /* Pickup icon */
     .pickup {
@@ -281,7 +294,7 @@
   <!-- Host-only: pick center hint overlay -->
   <div id="pickOverlay">
     <div class="bubble">
-      <b>Host:</b> Tap the map to choose the starting safe-zone center.<br/>
+      <b>Host:</b> Tap the map to choose the center of your game area<br/>
       Then use the sliders, press <b>Start</b>, and share the link.
     </div>
   </div>
@@ -330,8 +343,8 @@
   <button id="shareBtn" class="secondary" disabled>Share Game</button>
 </div>
 
-<div class="btnRow">
   <button id="hideUiBtn" class="hidebutton">Hide this menu</button>
+<div class="btnRow">
 </div>
 
     <div id="statusSmall"></div>
@@ -675,7 +688,8 @@
         eliminatedAt = new Date();
 
         const tStr = eliminatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-        elimSmall.textContent = `You are now a catcher • eliminated at ${tStr}`;
+        elimSmall.innerHTML = `You are now a catcher<br><span class="elimTime">Eliminated at ${tStr}</span>`;
+
 
         elimOverlay.style.display = "flex";
         elimFrame.style.display = "block";
