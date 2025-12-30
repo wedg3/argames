@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>IRL Storm Hide & Seek</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Storm Tag</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -20,29 +20,18 @@
       z-index: 1000;
       width: 360px;
       max-width: calc(100vw - 20px);
-      background: rgba(255,255,255,.01);
+      background: rgba(208, 230, 200,.32);
       border: 1px solid rgba(0,0,0,.18);
-      border-radius: 14px;
+      border-radius: 4px;
       padding: 10px 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,.12);
       backdrop-filter: blur(1px);
-      -webkit-backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(1px);
+	  font-weight:500;
     }
-	
-	
-#panel * {
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.85),
-    1px 0 0 rgba(255,255,255,.85),
-   -1px 0 0 rgba(255,255,255,.85),
-    0 -1px 0 rgba(255,255,255,.85),
-    0 0 6px rgba(0,0,0,.35);
-	
-	font-weight:700;
-	
-}
-
     #panel.hidden { display:none; }
+
+
 
     #panel h2{ margin:0 0 8px; font-size: 14px; }
     .note{ font-size:12px; opacity:.95; margin-bottom:8px; line-height:1.3; }
@@ -56,30 +45,35 @@
       margin-bottom: 6px;
     }
     .rowHeader .label{ font-size: 12px; color:#222; }
-    .rowHeader .val{ font-size: 12px; color:#111; font-weight: 800; }
+    .rowHeader .val{ font-size: 12px; color:#111; font-weight: 900; }
 
-    input[type="range"]{
-      width: 100%;
-      accent-color: #111;
-    }
+    input[type="range"]{ width: 100%; accent-color: #111; }
 
     .btnRow{ display:flex; gap:8px; margin-top: 8px; }
     button{
       flex:1;
       padding: 10px 10px;
       border:0;
-      border-radius: 12px;
+      border-radius: 4px;
       background: #111;
       color: #fff;
       cursor: pointer;
-      font-weight: 800;
+      font-weight: 900;
     }
     button.secondary{
       background: rgba(255,255,255,.75);
       color: #111;
       border: 1px solid rgba(0,0,0,.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+	
+	  button.hidebutton{
+      background: rgba(100,100,255,.55);
+      color: #111;
+      border: 1px solid rgba(0,0,0,.25);
+	  padding: 4px 10px;
+	  border-radius: 4px;
     }
     button:disabled{ opacity:.45; cursor:not-allowed; }
 
@@ -107,18 +101,18 @@
     #pickOverlay .bubble{
       pointer-events: none;
       width: min(560px, calc(100vw - 28px));
-      background: rgba(255,255,255,.78);
+      background: rgba(255,255,255,.80);
       border: 1px solid rgba(0,0,0,.18);
       border-radius: 16px;
       padding: 12px 12px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       box-shadow: 0 10px 30px rgba(0,0,0,.15);
       font-size: 13px;
       line-height: 1.3;
       color: #111;
     }
-    #pickOverlay .bubble b{ font-weight: 900; }
+    #pickOverlay .bubble b{ font-weight: 1000; }
 
     /* Host "Show UI" button wrapper (host-only) */
     #showUiWrap{
@@ -134,9 +128,9 @@
       background: rgba(255,255,255,.75);
       color: #111;
       border: 1px solid rgba(0,0,0,.25);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      font-weight: 800;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-weight: 900;
       cursor: pointer;
     }
 
@@ -154,9 +148,10 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       user-select: none;
+      pointer-events: none;
     }
     #heartIcon{
       width: 22px;
@@ -167,7 +162,7 @@
     }
     #healthValue{
       font-size: 18px;
-      font-weight: 900;
+      font-weight: 1000;
       letter-spacing: .5px;
       min-width: 40px;
       text-align: right;
@@ -177,7 +172,7 @@
     #bigStatus{
       position: fixed;
       left: 50%;
-      bottom: 14px;
+      bottom: max(14px, env(safe-area-inset-bottom));
       transform: translateX(-50%);
       z-index: 1100;
       width: min(520px, calc(100vw - 28px));
@@ -187,15 +182,16 @@
       padding: 10px 12px;
       color: #fff;
       text-align: center;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       pointer-events: none;
       user-select: none;
     }
     #bigStatus .main{
       font-size: 18px;
-      font-weight: 950;
+      font-weight: 1000;
       letter-spacing: .6px;
+      text-transform: none;
     }
     #bigStatus .sub{
       margin-top: 2px;
@@ -217,7 +213,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      pointer-events: none; /* important: allow map interaction */
+      pointer-events: none;
       user-select: none;
     }
     #elimOverlay .textWrap{
@@ -237,9 +233,9 @@
       font-size: clamp(14px, 3.3vw, 18px);
       color: rgba(255, 255, 255, .35);
       letter-spacing: .4px;
+      line-height: 1.25;
     }
 
-    /* Thick red frame when eliminated */
     #elimFrame{
       position: fixed;
       inset: 8px;
@@ -248,7 +244,34 @@
       pointer-events: none;
       border: 6px solid rgba(255, 50, 50, .55);
       border-radius: 18px;
-      box-shadow: 0 0 0 9999px rgba(0,0,0,0); /* no dim, just frame */
+    }
+
+    /* Pickup icon */
+    .pickup {
+      width: 38px;
+      height: 38px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.25);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .pickup img{
+      width: 26px; height: 26px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.35));
+      opacity: .95;
+    }
+    .pickup .val{
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      font-size: 12px;
+      font-weight: 1000;
+      color: rgba(255,255,255,.95);
+      text-shadow: 0 2px 10px rgba(0,0,0,.6);
     }
   </style>
 </head>
@@ -259,7 +282,7 @@
   <div id="pickOverlay">
     <div class="bubble">
       <b>Host:</b> Tap the map to choose the starting safe-zone center.<br/>
-      Then you’ll get the sliders to tune the storm and share the link.
+      Then use the sliders, press <b>Start</b>, and share the link.
     </div>
   </div>
 
@@ -267,37 +290,27 @@
   <div id="panel" class="hidden">
     <h2>Host Controls</h2>
     <div class="note">
-      Adjust sliders.Then press <b>Start</b> and <b>Copy link</b>.
+      The safe zone shrinks until it closes. Guests never see these controls.
     </div>
 
     <div class="row">
       <div class="rowHeader"><div class="label">Start radius (m)</div><div class="val" id="v_radius"></div></div>
-      <input id="startRadius" type="range" min="100" max="3000" step="50" value="1200" />
+      <input id="startRadius" type="range" min="100" max="5000" step="50" value="1200" />
     </div>
 
     <div class="row">
       <div class="rowHeader"><div class="label">Delay before storm (s)</div><div class="val" id="v_delay"></div></div>
-      <input id="delaySec" type="range" min="0" max="300" step="5" value="60" />
+      <input id="delaySec" type="range" min="0" max="600" step="10" value="60" />
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Shrink factor</div><div class="val" id="v_factor"></div></div>
-      <input id="shrinkFactor" type="range" min="0.40" max="0.90" step="0.05" value="0.70" />
+      <div class="rowHeader"><div class="label">Rest time (s)</div><div class="val" id="v_hold"></div></div>
+      <input id="holdTime" type="range" min="0" max="180" step="5" value="20" />
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Shrink time (s)</div><div class="val" id="v_shrink"></div></div>
-      <input id="shrinkTime" type="range" min="10" max="180" step="5" value="45" />
-    </div>
-
-    <div class="row">
-      <div class="rowHeader"><div class="label">Hold time (s)</div><div class="val" id="v_hold"></div></div>
-      <input id="holdTime" type="range" min="0" max="120" step="5" value="20" />
-    </div>
-
-    <div class="row">
-      <div class="rowHeader"><div class="label">Phases</div><div class="val" id="v_phases"></div></div>
-      <input id="phases" type="range" min="1" max="20" step="1" value="6" />
+      <div class="rowHeader"><div class="label">Game duration (min)</div><div class="val" id="v_gameMin"></div></div>
+      <input id="gameMin" type="range" min="5" max="120" step="5" value="30" />
     </div>
 
     <div class="row">
@@ -305,22 +318,28 @@
       <input id="dps" type="range" min="1" max="30" step="1" value="6" />
     </div>
 
-    <div class="btnRow">
-      <button id="startBtn" disabled>Start</button>
-      <button id="copyBtn" class="secondary" disabled>Copy link</button>
-    </div>
 
-    <div class="btnRow">
-      <button id="hideUiBtn" class="secondary">Hide UI</button>
-      <button id="resetBtn" class="secondary">Reset</button>
-    </div>
+
+<div class="btnRow">
+  <button id="resetBtn" class="secondary">Reset</button>
+  <button id="startBtn" disabled>START</button>
+</div>
+
+<div class="btnRow">
+  <button id="copyBtn" class="secondary" disabled>Copy Link to game</button>
+  <button id="shareBtn" class="secondary" disabled>Share Game</button>
+</div>
+
+<div class="btnRow">
+  <button id="hideUiBtn" class="hidebutton">Hide this menu</button>
+</div>
 
     <div id="statusSmall"></div>
   </div>
 
   <!-- Host-only: show UI button -->
   <div id="showUiWrap">
-    <button id="showUiBtn">Show UI</button>
+    <button id="showUiBtn">Show Menu</button>
   </div>
 
   <!-- Health HUD -->
@@ -340,7 +359,7 @@
   <div id="elimOverlay">
     <div class="textWrap">
       <div class="big">ELIMINATED</div>
-      <div class="small">You are now a catcher</div>
+      <div class="small" id="elimSmall">You are now a catcher</div>
     </div>
   </div>
 
@@ -375,7 +394,7 @@
       return function() {
         t += 0x6D2B79F5;
         let x = Math.imul(t ^ (t >>> 15), 1 | t);
-        x ^= x + Math.imul(x ^ (t >>> 7), 61 | x);
+        x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
         return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
       };
     }
@@ -388,19 +407,18 @@
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-    map.setView([59.3293, 18.0686], 13); // fallback (will be overridden by GPS if available)
 
-		if (navigator.geolocation) {
-		  navigator.geolocation.getCurrentPosition(
-			(pos) => {
-			  const lat = pos.coords.latitude;
-			  const lng = pos.coords.longitude;
-			  map.setView([lat, lng], 16); // set initial view to your GPS position
-			},
-			() => {}, // keep fallback if denied/fails
-			{ enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
-		  );
-		}
+    // fallback view
+    map.setView([59.3293, 18.0686], 13);
+
+    // initial view -> GPS if available
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 16),
+        () => {},
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      );
+    }
 
     // Local-only self marker (never shared)
     let selfMarker = null;
@@ -416,23 +434,45 @@
       );
     }
 
-
-
-    // Storm circle
+    // Storm circle (current)
     let stormCircle = null;
     function drawStorm(centerLatLng, radiusMeters) {
-      if (!stormCircle) stormCircle = L.circle(centerLatLng, { radius: radiusMeters, weight: 3, fillOpacity: 0.08 }).addTo(map);
-      else { stormCircle.setLatLng(centerLatLng); stormCircle.setRadius(radiusMeters); }
+      if (!stormCircle) {
+        stormCircle = L.circle(centerLatLng, { radius: radiusMeters, weight: 3, fillOpacity: 0.08, interactive: false }).addTo(map);
+      } else {
+        stormCircle.setLatLng(centerLatLng);
+        stormCircle.setRadius(radiusMeters);
+      }
+    }
+
+    // Preview circle (next target)
+    let previewCircle = null;
+    function drawPreview(centerLatLng, radiusM) {
+      if (!previewCircle) {
+        previewCircle = L.circle(centerLatLng, {
+          radius: radiusM,
+          weight: 2,
+          dashArray: "6 8",
+          fillOpacity: 0.02,
+          opacity: 0.75,
+          interactive: false
+        }).addTo(map);
+      } else {
+        previewCircle.setLatLng(centerLatLng);
+        previewCircle.setRadius(radiusM);
+      }
+    }
+    function clearPreview() {
+      if (previewCircle) { map.removeLayer(previewCircle); previewCircle = null; }
     }
 
     // ============================================================
-    // Blue "storm" mask outside the safe circle
-    // Implemented as a polygon with a "hole" (inner ring = safe circle)
+    // Blue "storm" mask outside the safe circle (polygon with a hole)
     // ============================================================
     let stormMask = null;
 
     function destinationPoint(lat, lng, bearingDeg, distanceM) {
-      const R = 6371000; // earth radius
+      const R = 6371000;
       const brng = bearingDeg * Math.PI/180;
       const lat1 = lat * Math.PI/180;
       const lon1 = lng * Math.PI/180;
@@ -454,7 +494,6 @@
     }
 
     function updateStormMask(center, radiusM) {
-      // Outer ring: world-ish rectangle (bigger than map)
       const outer = [
         [-85, -180],
         [-85,  180],
@@ -468,15 +507,13 @@
           stroke: false,
           fill: true,
           fillColor: "#2a7fff",
-          fillOpacity: 0.48,
+          fillOpacity: 0.40, // <--- storm background opacity
           interactive: false
         }).addTo(map);
       } else {
         stormMask.setLatLngs([outer, inner]);
       }
     }
-
-let isHostLocal = false;
 
     // ============================================================
     // Host start center marker
@@ -486,6 +523,7 @@ let isHostLocal = false;
 
     function setStartCenter(latlng){
       chosenStartCenter = latlng;
+
       if (!startCenterMarker) {
         startCenterMarker = L.marker(latlng, { draggable: true }).addTo(map);
         startCenterMarker.on("dragend", () => {
@@ -500,7 +538,7 @@ let isHostLocal = false;
     }
 
     // ============================================================
-    // Deterministic storm geometry
+    // Deterministic geometry helpers
     // ============================================================
     function randomPointInDiskMeters(center, maxR, rng) {
       const u = rng();
@@ -517,88 +555,128 @@ let isHostLocal = false;
 
       return L.latLng(lat + (north / metersPerDegLat), center.lng + (east / metersPerDegLng));
     }
-    function chooseNextCenter(currentCenter, currentR, nextR, rng) {
-      const maxShift = Math.max(0, currentR - nextR);
-      return randomPointInDiskMeters(currentCenter, maxShift, rng);
+
+    // New: next center can be anywhere within the old circle (relaxed)
+    function chooseNextCenterRelaxed(currentCenter, currentR, rng) {
+      return randomPointInDiskMeters(currentCenter, currentR, rng);
     }
 
     // ============================================================
-    // State
+    // State (v2): shrink-until-closed within a fixed game duration
     // ============================================================
     let activeState = null;
+    let isHostLocal = false;
 
-    function buildSeededPhases(st) {
+    function buildSeededCircles(st) {
       const rng = mulberry32(st.seed);
-      let curCenter = L.latLng(st.baseCenter.lat, st.baseCenter.lng);
-      let curR = st.baseRadiusM;
 
-      const phases = [];
-      for (let i = 0; i < st.phasesCount; i++) {
-        const nextR = Math.max(30, curR * st.shrinkFactor);
-        const nextCenter = chooseNextCenter(curCenter, curR, nextR, rng);
-        phases.push({ toCenter: { lat: nextCenter.lat, lng: nextCenter.lng }, toRadiusM: nextR });
-        curCenter = nextCenter;
-        curR = nextR;
+      const playSec = Math.max(0, st.gameDurationSec - st.delaySec);
+      const cycleSec = st.holdSec + st.moveSec;
+      const moves = Math.max(1, Math.ceil(playSec / Math.max(1, cycleSec))); // cover the full duration
+
+      const totalMoveSec = moves * st.moveSec;
+      const r0 = st.baseRadiusM;
+      const rMin = Math.max(2, st.minRadiusM);
+
+      // exponential shrink per second so r reaches rMin exactly at end of total movement time
+      const k = Math.log(rMin / r0) / totalMoveSec; // negative
+
+      let curCenter = L.latLng(st.baseCenter.lat, st.baseCenter.lng);
+
+      const circles = [];
+      circles.push({ center: { lat: curCenter.lat, lng: curCenter.lng }, radiusM: r0 });
+
+      let movedSoFar = 0;
+      for (let i = 0; i < moves; i++) {
+        const rStart = circles[circles.length - 1].radiusM;
+        const rEnd = Math.max(rMin, r0 * Math.exp(k * (movedSoFar + st.moveSec)));
+
+        const nextCenterLL = chooseNextCenterRelaxed(curCenter, rStart, rng);
+        circles.push({ center: { lat: nextCenterLL.lat, lng: nextCenterLL.lng }, radiusM: rEnd });
+
+        curCenter = nextCenterLL;
+        movedSoFar += st.moveSec;
       }
-      return phases;
+      return circles; // length = moves+1
     }
 
-    function computePhaseAtTime(st, tMs) {
+    function computePhaseAtTimeV2(st, tMs) {
       const start = st.startedAtMs;
       const delayEnd = start + st.delaySec*1000;
+      const endAt = start + st.gameDurationSec*1000;
+
       if (tMs < start) return { kind: "prestart" };
+      if (tMs >= endAt) {
+        const last = st.circles[st.circles.length - 1];
+        return { kind: "finished", center: last.center, radiusM: last.radiusM, endAtMs: endAt };
+      }
 
       if (tMs < delayEnd) {
-        return { kind: "delay", center: st.baseCenter, radiusM: st.baseRadiusM, tLeftMs: delayEnd - tMs };
+        const c0 = st.circles[0];
+        return { kind: "delay", center: c0.center, radiusM: c0.radiusM, tLeftMs: delayEnd - tMs, endAtMs: endAt };
       }
 
-      let curCenter = st.baseCenter;
-      let curR = st.baseRadiusM;
-      let cursor = delayEnd;
+      const elapsed = tMs - delayEnd;
+      const cycleMs = (st.holdSec + st.moveSec) * 1000;
+      const idx = Math.floor(elapsed / Math.max(1, cycleMs)); // move index
+      const within = elapsed - idx * cycleMs;
 
-      for (let i = 0; i < st.phases.length; i++) {
-        const ph = st.phases[i];
-        const shrinkEnd = cursor + st.shrinkSec*1000;
-        const holdEnd = shrinkEnd + st.holdSec*1000;
+      const from = st.circles[Math.min(idx, st.circles.length - 2)];
+      const to   = st.circles[Math.min(idx + 1, st.circles.length - 1)];
 
-        if (tMs < shrinkEnd) {
-          const a = (tMs - cursor) / (st.shrinkSec*1000);
-          const radiusM = curR + (ph.toRadiusM - curR) * a;
-          const center = {
-            lat: curCenter.lat + (ph.toCenter.lat - curCenter.lat) * a,
-            lng: curCenter.lng + (ph.toCenter.lng - curCenter.lng) * a
-          };
-          return { kind: "shrinking", phaseIndex: i+1, phaseCount: st.phases.length, center, radiusM, tLeftMs: shrinkEnd - tMs };
-        }
-
-        if (tMs < holdEnd) {
-          return { kind: "holding", phaseIndex: i+1, phaseCount: st.phases.length, center: ph.toCenter, radiusM: ph.toRadiusM, tLeftMs: holdEnd - tMs };
-        }
-
-        curCenter = ph.toCenter;
-        curR = ph.toRadiusM;
-        cursor = holdEnd;
+      const holdMs = st.holdSec * 1000;
+      if (within < holdMs) {
+        return {
+          kind: "holding",
+          center: from.center,
+          radiusM: from.radiusM,
+          nextCenter: to.center,
+          nextRadiusM: to.radiusM,
+          tLeftMs: holdMs - within,
+          endAtMs: endAt
+        };
       }
 
-      return { kind: "finished", center: curCenter, radiusM: curR };
+      const moveMs = st.moveSec * 1000;
+      const a = Math.min(1, Math.max(0, (within - holdMs) / Math.max(1, moveMs)));
+
+      return {
+        kind: "shrinking",
+        center: {
+          lat: from.center.lat + (to.center.lat - from.center.lat) * a,
+          lng: from.center.lng + (to.center.lng - from.center.lng) * a
+        },
+        radiusM: from.radiusM + (to.radiusM - from.radiusM) * a,
+        nextCenter: to.center,
+        nextRadiusM: to.radiusM,
+        tLeftMs: moveMs - (within - holdMs),
+        endAtMs: endAt
+      };
     }
 
     // ============================================================
-    // Health (local-only) + eliminated visuals
+    // Health + elimination time (no max health)
     // ============================================================
     let health = 100;
     let eliminated = false;
+    let eliminatedAt = null;
     let lastTickMs = Date.now();
 
     const healthValueEl = document.getElementById("healthValue");
     const elimOverlay = document.getElementById("elimOverlay");
     const elimFrame = document.getElementById("elimFrame");
+    const elimSmall = document.getElementById("elimSmall");
 
     function setHealth(val){
-      health = Math.max(0, Math.min(100, val));
+      health = val;
       healthValueEl.textContent = String(Math.round(health));
       if (health <= 0 && !eliminated) {
         eliminated = true;
+        eliminatedAt = new Date();
+
+        const tStr = eliminatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        elimSmall.textContent = `You are now a catcher • eliminated at ${tStr}`;
+
         elimOverlay.style.display = "flex";
         elimFrame.style.display = "block";
       }
@@ -611,7 +689,97 @@ let isHostLocal = false;
     }
 
     // ============================================================
-    // UI refs
+    // Big status
+    // ============================================================
+    const bsMain = document.getElementById("bsMain");
+    const bsSub  = document.getElementById("bsSub");
+    const bigStatus = document.getElementById("bigStatus");
+
+    function setBigStatus(main, sub="", danger=false){
+      bsMain.textContent = main;
+      bsSub.textContent = sub;
+      bigStatus.classList.toggle("danger", !!danger);
+    }
+
+    // ============================================================
+    // Pickups (seeded) – local collection (honesty mode)
+    // ============================================================
+    let pickupMarkers = new Map();      // id -> leaflet marker
+    let collectedPickupIds = new Set(); // local only
+
+    function makePickupIcon(value) {
+      const html = `
+        <div class="pickup">
+          <img src="heart.png" alt="heart">
+          <div class="val">${value}</div>
+        </div>`;
+      return L.divIcon({ html, className: "", iconSize: [38,38], iconAnchor:[19,19] });
+    }
+
+    function buildSeededPickups(st) {
+      const rng = mulberry32(st.seed ^ 0xA53C9E17);
+
+      const count = Math.max(6, Math.floor(st.gameDurationSec / 45)); // ~1 per 45s, min 6
+      const values = [20, 50, 100];
+      const pickups = [];
+      const centerLL = L.latLng(st.baseCenter.lat, st.baseCenter.lng);
+
+      for (let i = 0; i < count; i++) {
+        const earliest = st.delaySec + 5;
+        const latest = Math.max(earliest + 5, st.gameDurationSec - 5);
+        const spawnSec = earliest + Math.floor(rng() * (latest - earliest));
+
+        const pLL = randomPointInDiskMeters(centerLL, st.baseRadiusM, rng);
+        const val = values[Math.floor(rng() * values.length)];
+
+        pickups.push({
+          id: `p${i}`,
+          lat: pLL.lat,
+          lng: pLL.lng,
+          value: val,
+          spawnAtMs: st.startedAtMs + spawnSec * 1000
+        });
+      }
+      return pickups.sort((a,b) => a.spawnAtMs - b.spawnAtMs);
+    }
+
+    function clearPickups() {
+      for (const m of pickupMarkers.values()) map.removeLayer(m);
+      pickupMarkers.clear();
+      collectedPickupIds.clear();
+    }
+
+    function updatePickups(st, nowMs, myPos) {
+      if (!st?.pickups) return;
+
+      const pickupRadiusM = 35;
+
+      for (const p of st.pickups) {
+        if (collectedPickupIds.has(p.id)) continue;
+        if (nowMs < p.spawnAtMs) continue;
+
+        if (!pickupMarkers.has(p.id)) {
+          const m = L.marker([p.lat, p.lng], { icon: makePickupIcon(p.value), interactive: false });
+          m.addTo(map);
+          pickupMarkers.set(p.id, m);
+        }
+
+        if (myPos) {
+          const d = myPos.distanceTo(L.latLng(p.lat, p.lng));
+          if (d <= pickupRadiusM) {
+            collectedPickupIds.add(p.id);
+            const m = pickupMarkers.get(p.id);
+            if (m) { map.removeLayer(m); pickupMarkers.delete(p.id); }
+
+            // no max health
+            setHealth(health + p.value);
+          }
+        }
+      }
+    }
+
+    // ============================================================
+    // UI refs (host controls)
     // ============================================================
     const panel = document.getElementById("panel");
     const pickOverlay = document.getElementById("pickOverlay");
@@ -621,35 +789,26 @@ let isHostLocal = false;
     const resetBtn = document.getElementById("resetBtn");
     const startBtn = document.getElementById("startBtn");
     const copyBtn = document.getElementById("copyBtn");
+	const shareBtn = document.getElementById("shareBtn");
     const statusSmall = document.getElementById("statusSmall");
 
     const startRadiusEl = document.getElementById("startRadius");
     const delaySecEl = document.getElementById("delaySec");
-    const shrinkFactorEl = document.getElementById("shrinkFactor");
-    const shrinkTimeEl = document.getElementById("shrinkTime");
     const holdTimeEl = document.getElementById("holdTime");
-    const phasesEl = document.getElementById("phases");
+    const gameMinEl = document.getElementById("gameMin");
     const dpsEl = document.getElementById("dps");
 
     const v_radius = document.getElementById("v_radius");
     const v_delay  = document.getElementById("v_delay");
-    const v_factor = document.getElementById("v_factor");
-    const v_shrink = document.getElementById("v_shrink");
     const v_hold   = document.getElementById("v_hold");
-    const v_phases = document.getElementById("v_phases");
+    const v_gameMin = document.getElementById("v_gameMin");
     const v_dps    = document.getElementById("v_dps");
-
-    const bsMain = document.getElementById("bsMain");
-    const bsSub  = document.getElementById("bsSub");
-    const bigStatus = document.getElementById("bigStatus");
 
     function reflectSliderValues(){
       v_radius.textContent = `${startRadiusEl.value} m`;
       v_delay.textContent  = `${delaySecEl.value} s`;
-      v_factor.textContent = `${Number(shrinkFactorEl.value).toFixed(2)}`;
-      v_shrink.textContent = `${shrinkTimeEl.value} s`;
       v_hold.textContent   = `${holdTimeEl.value} s`;
-      v_phases.textContent = `${phasesEl.value}`;
+      v_gameMin.textContent = `${gameMinEl.value} min`;
       v_dps.textContent    = `${dpsEl.value} /s`;
     }
     reflectSliderValues();
@@ -682,8 +841,7 @@ let isHostLocal = false;
       showUiWrap.style.display = "none";
     };
 
-    // Slider changes update preview + labels
-    for (const el of [startRadiusEl, delaySecEl, shrinkFactorEl, shrinkTimeEl, holdTimeEl, phasesEl, dpsEl]) {
+    for (const el of [startRadiusEl, delaySecEl, holdTimeEl, gameMinEl, dpsEl]) {
       el.addEventListener("input", () => {
         reflectSliderValues();
         if (!activeState) previewStartCircle();
@@ -703,75 +861,80 @@ let isHostLocal = false;
     });
 
     // ============================================================
-    // Load from hash (guest mode) — hides host UI
+    // Load from hash (guest mode) — hides host UI unless hostLocal
     // ============================================================
     function loadFromHash() {
       const p = parseHashParams();
       if (!p || !p.v) return false;
 
-      // If I'm not the host on this device, treat as guest and hide host UI
-		if (!isHostLocal) {
-		  pickOverlay.style.display = "none";
-		  panel.classList.add("hidden");
-		  showUiWrap.style.display = "none";
-		} else {
-		  // host who started the game should still be able to copy/hide UI
-		  copyBtn.disabled = false;
-		}
-
       const v = Number(p.v);
-      if (v !== 1) return false;
+      if (v !== 2) return false;
+
+      // Hide host UI if I'm not the host on this device
+      if (!isHostLocal) {
+        pickOverlay.style.display = "none";
+        panel.classList.add("hidden");
+        showUiWrap.style.display = "none";
+      }
 
       const baseCenter = { lat: Number(p.lat), lng: Number(p.lng) };
       const baseRadiusM = Number(p.r);
       const delaySec = Number(p.delay);
-      const shrinkFactor = Number(p.factor);
-      const shrinkSec = Number(p.shrink);
       const holdSec = Number(p.hold);
-      const phasesCount = Number(p.phases);
+      const gameMin = Number(p.gameMin);
       const dps = Number(p.dps);
       const seed = Number(p.seed) >>> 0;
       const startedAtMs = Number(p.t0);
 
-      if (![baseCenter.lat, baseCenter.lng, baseRadiusM, seed, startedAtMs].every(Number.isFinite)) return false;
+      if (![baseCenter.lat, baseCenter.lng, baseRadiusM, seed, startedAtMs, delaySec, holdSec, gameMin, dps].every(Number.isFinite)) {
+        return false;
+      }
 
       activeState = {
-        version: 1,
+        version: 2,
         seed,
         startedAtMs,
         baseCenter,
         baseRadiusM,
         delaySec,
-        shrinkFactor,
-        shrinkSec,
         holdSec,
-        phasesCount,
+        gameDurationSec: Math.max(60, gameMin * 60),
         dps,
-        phases: []
+        minRadiusM: 8,
+        moveSec: 20,  // fixed move time (speed is computed to finish by game end)
+        circles: [],
+        pickups: []
       };
-      activeState.phases = buildSeededPhases(activeState);
+
+      activeState.circles = buildSeededCircles(activeState);
+      activeState.pickups = buildSeededPickups(activeState);
 
       map.setView([baseCenter.lat, baseCenter.lng], 14);
       drawStorm(baseCenter, baseRadiusM);
       updateStormMask(L.latLng(baseCenter.lat, baseCenter.lng), baseRadiusM);
+      clearPreview();
 
-      // reset local health
+      // reset local health + elim visuals
       eliminated = false;
+      eliminatedAt = null;
       elimOverlay.style.display = "none";
       elimFrame.style.display = "none";
-      setHealth(100);
+      setHealth(health <= 0 ? 100 : health); // ensure HUD updates
+      if (health <= 0) setHealth(100);
+
+      clearPickups();
 
       return true;
     }
 
     // ============================================================
-    // Host Start -> generates seeded link
+    // Host Start -> generates seeded link (v2)
     // ============================================================
     startBtn.onclick = () => {
       if (!chosenStartCenter) return;
-	
-	isHostLocal = true;
-	
+
+      isHostLocal = true;
+
       const seed = (crypto?.getRandomValues)
         ? (crypto.getRandomValues(new Uint32Array(1))[0] >>> 0)
         : (Math.floor(Math.random() * 2147483647) >>> 0);
@@ -779,115 +942,117 @@ let isHostLocal = false;
       const startedAtMs = Date.now();
 
       const params = {
-        v: 1,
+        v: 2,
         lat: chosenStartCenter.lat.toFixed(6),
         lng: chosenStartCenter.lng.toFixed(6),
         r: Math.round(Number(startRadiusEl.value)),
         delay: Math.round(Number(delaySecEl.value)),
-        factor: Number(shrinkFactorEl.value).toFixed(2),
-        shrink: Math.round(Number(shrinkTimeEl.value)),
         hold: Math.round(Number(holdTimeEl.value)),
-        phases: Math.round(Number(phasesEl.value)),
+        gameMin: Math.round(Number(gameMinEl.value)),
         dps: Math.round(Number(dpsEl.value)),
         seed: seed,
         t0: startedAtMs
       };
 
-
-
       setHashParams(params);
 
-      // Activate local state (host)
-      activeState = {
-        version: 1,
-        seed,
-        startedAtMs,
-        baseCenter: { lat: Number(params.lat), lng: Number(params.lng) },
-        baseRadiusM: Number(params.r),
-        delaySec: Number(params.delay),
-        shrinkFactor: Number(params.factor),
-        shrinkSec: Number(params.shrink),
-        holdSec: Number(params.hold),
-        phasesCount: Number(params.phases),
-        dps: Number(params.dps),
-        phases: []
-      };
-      activeState.phases = buildSeededPhases(activeState);
+      // Load state locally as host
+      loadFromHash();
 
       copyBtn.disabled = false;
+	  shareBtn.disabled = false;
       statusSmall.textContent = "Started. Copy and share the link.";
-      // keep UI visible; host can hide
     };
 
     copyBtn.onclick = async () => {
-      try {
-        await navigator.clipboard.writeText(location.href);
-        statusSmall.textContent = "Copied share link ✅";
-      } catch {
-        prompt("Copy this link:", location.href);
-      }
-    };
+	  try {
+		await navigator.clipboard.writeText(location.href);
+		statusSmall.textContent = "Copied share link ✅";
+	  } catch {
+		prompt("Copy this link:", location.href);
+	  }
+	};
+	
+	shareBtn.onclick = async () => {
+	  const msg = `Come play Storm Tag with me:\n${location.href}`;
+
+	  // Best: native share sheet (mobile)
+	  if (navigator.share) {
+		try {
+		  await navigator.share({ text: msg });
+		  statusSmall.textContent = "Share opened ✅";
+		  return;
+		} catch {
+		  // user cancelled or share failed -> fall through to fallback
+		}
+	  }
+
+	  // Fallback: copy message to clipboard, or show prompt
+	  try {
+		await navigator.clipboard.writeText(msg);
+		statusSmall.textContent = "Share message copied ✅";
+	  } catch {
+		prompt("Copy this message:", msg);
+	  }
+	};
 
     resetBtn.onclick = () => {
       location.hash = "";
       activeState = null;
-		isHostLocal = false;
+      isHostLocal = false;
 
       eliminated = false;
+      eliminatedAt = null;
       elimOverlay.style.display = "none";
       elimFrame.style.display = "none";
       setHealth(100);
+      elimSmall.textContent = "You are now a catcher";
 
       if (stormCircle) { map.removeLayer(stormCircle); stormCircle = null; }
       if (stormMask) { map.removeLayer(stormMask); stormMask = null; }
-      if (startCenterMarker) { map.removeLayer(startCenterMarker); startCenterMarker = null; }
+      clearPreview();
+      clearPickups();
 
+      if (startCenterMarker) { map.removeLayer(startCenterMarker); startCenterMarker = null; }
       chosenStartCenter = null;
+
       copyBtn.disabled = true;
+	  shareBtn.disabled = true;
       startBtn.disabled = true;
 
       panel.classList.add("hidden");
       showUiWrap.style.display = "none";
       pickOverlay.style.display = "flex";
       statusSmall.textContent = "Reset. Tap the map to pick a new center.";
-      bsMain.textContent = "Waiting…";
-      bsSub.textContent = "";
-      bigStatus.classList.remove("danger");
+
+      setBigStatus("Waiting…", "", false);
     };
 
     // ============================================================
     // Initial mode selection
     // ============================================================
     if (loadFromHash()) {
-      // guest mode
-      statusSmall.textContent = "";
+      // guest mode or host-loaded
+      if (!isHostLocal) {
+        statusSmall.textContent = "";
+      }
+      setBigStatus("Waiting…", "", false);
     } else {
       // host setup mode
       panel.classList.add("hidden");
       showUiWrap.style.display = "none";
       pickOverlay.style.display = "flex";
       statusSmall.textContent = "Tap the map to pick start center.";
-      bsMain.textContent = "Waiting…";
-      bsSub.textContent = "";
-      bigStatus.classList.remove("danger");
+      setBigStatus("Waiting…", "", false);
     }
 
     window.addEventListener("hashchange", () => {
-      // If a new link is loaded while open, switch to guest mode
+      // If a new link is loaded while open, switch to guest (unless hostLocal)
       loadFromHash();
     });
 
     // ============================================================
-    // BIG STATUS logic
-    // ============================================================
-    function setBigStatus(main, sub="", danger=false){
-      bsMain.textContent = main;
-      bsSub.textContent = sub;
-      bigStatus.classList.toggle("danger", !!danger);
-    }
-
-    // ============================================================
-    // Main loop: storm + mask + health + status
+    // Main loop: storm + mask + preview + health + status + pickups
     // ============================================================
     function loop() {
       const t = Date.now();
@@ -895,40 +1060,50 @@ let isHostLocal = false;
       lastTickMs = t;
 
       if (activeState) {
-        const ph = computePhaseAtTime(activeState, t);
+        const ph = computePhaseAtTimeV2(activeState, t);
+
         if (ph?.center && typeof ph.radiusM === "number") {
           drawStorm(ph.center, ph.radiusM);
           updateStormMask(L.latLng(ph.center.lat, ph.center.lng), ph.radiusM);
         }
 
-        const myPos = selfMarker ? selfMarker.getLatLng() : null;
-        const center = ph?.center ?? activeState.baseCenter;
-        const radiusM = ph?.radiusM ?? activeState.baseRadiusM;
-
-        const outside = (!eliminated) && isOutsideCircle(myPos, center, radiusM);
-
-        // Damage + big status
-        if (ph?.kind === "delay") {
-          const s = Math.ceil(ph.tLeftMs/1000);
-          setBigStatus("Storm is resting", `Moves in ${s}s`, false);
-        } else if (ph?.kind === "holding") {
-          const s = Math.ceil(ph.tLeftMs/1000);
-          setBigStatus("Storm is resting", `Moves in ${s}s`, false);
-        } else if (ph?.kind === "shrinking") {
-          setBigStatus("Storm is moving", "", false);
+        // show next circle during holding (Fortnite-style)
+        if (ph?.kind === "holding" && ph.nextCenter && typeof ph.nextRadiusM === "number") {
+          drawPreview(ph.nextCenter, ph.nextRadiusM);
         } else {
-          setBigStatus("Storm is moving", "", false);
+          clearPreview();
         }
 
-        if (!eliminated) {
-          if (ph?.kind !== "delay" && outside) {
-            setHealth(health - activeState.dps * dt);
+        const myPos = selfMarker ? selfMarker.getLatLng() : null;
+
+        // Pickups (only after delay has begun, but harmless otherwise)
+        updatePickups(activeState, t, myPos);
+
+        // Big status
+        if (ph.kind === "delay") {
+		  const s = Math.ceil(ph.tLeftMs / 1000);
+		  setBigStatus("Time until game starts", `${s}s`, false);
+
+		} else if (ph.kind === "holding") {
+		  const s = Math.ceil(ph.tLeftMs / 1000);
+		  setBigStatus("Storm is resting", `Moves in ${s}s`, false);
+
+		} else if (ph.kind === "shrinking") {
+		  setBigStatus("Storm is moving", "", false);
+
+		} else if (ph.kind === "finished") {
+		  setBigStatus("Game ended", "", false);
+		}
+
+
+        // Damage (no damage during delay; no damage after eliminated)
+        if (!eliminated && ph.kind !== "delay" && ph.center && typeof ph.radiusM === "number") {
+          const outside = isOutsideCircle(myPos, ph.center, ph.radiusM);
+          if (outside) {
             setBigStatus("YOU ARE IN THE STORM!", "", true);
+            setHealth(health - activeState.dps * dt);
           }
         }
-      } else {
-        // no active game
-        setBigStatus("Waiting…", "", false);
       }
 
       requestAnimationFrame(loop);
