@@ -15,19 +15,20 @@
 
     /* Host panel (host-only) */
     #panel{
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-       width: calc(100vw - 20px);
-       max-width: 360px;
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 14px);
+        max-width: 380px;
       
-       background: rgba(230, 230, 230,.82);
+       background: rgba(230, 230, 230,1);
       border: 1px solid rgba(0,0,0,.18);
       border-radius: 4px;
       padding: 10px 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,.12);
       backdrop-filter: blur(1px);
+      z-index: 10001;
       -webkit-backdrop-filter: blur(1px);
 	  font-weight:500;
     }
@@ -171,16 +172,16 @@
 
     /* BIG STATUS (bottom center) */
     #bigStatus{
-      position: fixed;
-      left: 50%;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      transform: translateX(-50%);
-      z-index: 1100;
-      width: calc(100vw - 28px);
+        position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: calc(100vw - 28px);
   max-width: 520px;
       background: rgba(0,0,0,.35);
       border: 1px solid rgba(255,255,255,.45);
       border-radius: 4px;
+      z-index: 1100;
       padding: 10px 12px;
       color: #fff;
       text-align: center;
