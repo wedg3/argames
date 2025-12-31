@@ -642,12 +642,12 @@ function holdSecForRadius(baseHoldSec, r, r0){
     }).addTo(map);
 
     // fallback view
-    map.setView([59.3293, 18.0686], 13);
+    map.setView([62.17211, 14.92897], 12);
 
     // initial view -> GPS if available
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 16),
+        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 14),
         () => {},
         { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
       );
@@ -1199,6 +1199,9 @@ function enableHostPanel(){
 
       const v = Number(p.v);
       if (v !== 2) return false;
+
+      map.setView([baseCenter.lat, baseCenter.lng], 14);
+
 
       // Hide host UI if I'm not the host on this device
       if (!isHostLocal) {
