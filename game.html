@@ -1184,6 +1184,7 @@ function enableHostPanel(){
         
         panel.classList.add("hidden");
         showUiWrap.style.display = "none";
+        radiusSelectEl.style.display = "none";
       }
 
       const baseCenter = { lat: Number(p.lat), lng: Number(p.lng) };
@@ -1217,6 +1218,8 @@ function enableHostPanel(){
 
       activeState.circles = buildSeededCircles(activeState);
       activeState.pickups = buildSeededPickups(activeState);
+
+      caughtBtn.style.display = "block";
 	  
 	  // Restore locally collected pickups for this game
 	try {
