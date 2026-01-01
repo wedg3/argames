@@ -20,7 +20,7 @@
 
     body{
       color: var(--ink);
-       background-image: url("back1.jpg");
+       background-image: url("assets/back1.jpg");
 
       overflow-x:hidden;
     }
@@ -66,6 +66,14 @@
 
       margin: 6px 0 6px;
       font-size: clamp(24px, 6.2vw, 30px);
+      letter-spacing: .4px;
+      line-height: 1.05;
+	  text-align: center;
+    }
+	  h2{
+
+      margin: 6px 0 6px;
+      font-size: clamp(14px, 6.2vw, 16px);
       letter-spacing: .4px;
       line-height: 1.05;
 	  text-align: center;
@@ -172,6 +180,12 @@
       .card{ padding: 16px 14px; border-radius: 6px; }
       .step{ padding: 11px 11px; }
     }
+	
+	.warning1 {color:#d1001c;  text-shadow:        -1px -1px 0 #fff,
+     1px -1px 0 #fff,
+    -1px  1px 0 #fff,
+     1px  1px 0 #fff;
+}
   </style>
 </head>
 <body>
@@ -183,50 +197,52 @@
       
 <br>
       <p class="lead" align="center" >
-       <i> A storm has gripped the land and you must stay in its shrinking and moving eye!</i></p>
+       <i> A storm has gripped the land and you must stay in its shrinking eye... all while staying away from the "catchers"!</i></p>
 		<p class="lead">
-		In this game, the host (you) creates a game you can play with your friends in your town or your area. You need to stay within the circles and they are shrinking to zero.
+		In this game, the host (you) creates a game you can play with your friends in your town or your area. You need to stay within the circles and they are shrinking to zero. When you see a <span class="warning1">red circle</span> you need to move to it before the time runs out.
         <p class="lead">As a host, when you start, you get to pick an area (in real life) to play in. You can make up your own rules if you want! </p>
 		
-		<p class="lead">The storm decreases health. Hearts give you health. There is no max limit to health. All players see heart-locations (including catchers).
-		When you run out of life you are "Eliminated"</p>
+		<p class="lead">The storm decreases health. Hearts <img src="assets/heart.png" style="vertical-align:middle" width="20 px"> give you health. There is no max limit to health. All players see heart-locations (including catchers).
+		When you run out of life you are "<span class="warning1">Eliminated</span>"</p>
       </p>
 	  
+
 	          <li class="step">
           <div class="num">?</div>
           <div>
             <b>Rules: (suggestion)</b>
-            <p>- You play tag and one person is "it" (catcher)</p> 
-			<p>- Anyone who is caught by the catcher is now also a catcher.</p>
+            <p>- You play tag and one or more person(s) is "it" (catcher)</p> 
 			<p>- Anyone who is eliminated by the storm is now also a catcher.</p>
+			<p>- Anyone who is caught by the catcher hits the "<span class="warning1">I am caught</span>"-button and is now also a catcher.</p>
 			<br>
-			<p> <i>You need some way to make catchers identifiable (like a ribbon or hat or something).</i></p>
+			<p>You need some way to make catchers <span class="warning1">identifiable</span> (like a ribbon or hat or something).</p>
 			<br>
-			<p>- Last one remaining wins.</p>
+			<p><b>- Last one remaining wins -</b> You can see the elimination time and how many storms you have survived at the end. This way you know who lasted longest. If someone has survived fewer storms, they might have cheated by reloading the page.</p>
           </div>
         </li>
 		
 <br>
+	  <h2>How to host a game</h2>
       <ul class="steps">
         <li class="step">
           <div class="num">1</div>
           <div>
             <b>Pick a start area</b>
-            <p>Tap the map to choose the starting safe zone for your town or neighborhood.</p>
+            <p>Zoom in to your town or start area. Tap the map to choose the game area, then adjust the radius of your area.</p>
           </div>
         </li>
         <li class="step">
           <div class="num">2</div>
           <div>
             <b>Adjust the settings</b>
-            <p>Maybe try them out yourself before inviting friends.</p>
+            <p>Open the menu at the top to view and adjust the settings. A faster game will be more difficult and will requre more running. If you want a slow, relaxing but maybe more strategical game, make it slower. I suggest trying your settings yourself first.</p>
           </div>
         </li>
         <li class="step">
           <div class="num">3</div>
           <div>
             <b>Copy or share link → invite friends</b>
-            <p>Everyone opens the same link and sees the same storm. You do not share position with anyone.</p>
+            <p>Share your game. Everyone opens the same link and sees the same storm and same hearts. No one shares their game or position with anyone.</p>
           </div>
         </li>
       </ul>
