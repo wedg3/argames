@@ -30,7 +30,7 @@
       backdrop-filter: blur(1px);
       z-index: 10001;
       -webkit-backdrop-filter: blur(1px);
-	  font-weight:500;
+	  font-weight:400;
     }
     #panel.hidden { display:none; }
 
@@ -40,6 +40,7 @@
 	
     .note{ font-size:12px; opacity:.95; margin-bottom:8px; line-height:1.3; padding-bottom:15px; }
 .warning{color:#d11b1b}
+.warningthin{color:#d11b1b; font-weight:200;}
 	.note2{ font-size:10px; opacity:.95;   place-items: center; text-align: center;}
    
 
@@ -51,6 +52,7 @@
       gap: 10px;
       margin-bottom: 6px;
       margin-top: 3px;
+	  font-weight:700;
     }
     .rowHeader .label{ font-size: 12px; color:#222; }
     .rowHeader .val{ font-size: 12px; color:#111; font-weight: 900; }
@@ -240,10 +242,9 @@
     }
     #elimOverlay .small{
       margin-top: 8px;
-      font-size: clamp(14px, 3.3vw, 18px);
-      color: rgba(255, 255, 255, 1);
-      letter-spacing: .4px;
+      font-size: clamp(14px, 3.3vw, 18px);      letter-spacing: .4px;
       line-height: 1.25;
+	  color: black;
     }
 	
 	#elimOverlay .elimTime{
@@ -251,6 +252,7 @@
 	  margin-top: 6px;
 	  font-size: 0.9em;
 	  opacity: 1;
+	  
 	}
 
     #elimFrame{
@@ -421,7 +423,7 @@
     <h2>- Game Settings -</h2>
    <div class="note">
       Press <b>"Hide this menu"</b> to adjust the Game Area or when playing the game. <span class="warning">Play in a safe area!</span> Avoid major roads or railways. When finished, hit START and share your game.
-	  <p>These are recommended settings. The rest time suggestion is based on your area size. </p>
+	  <p>These are recommended settings for a relatively fast game. Increase game duration or rest time to make it easier. The rest time suggestion is based on your area size. </p>
      <p><i> <span class="warning">Tip:</span> Try the game with your settings before playing with others.</p></i>
    </div>
 	 
@@ -433,13 +435,13 @@
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Rest time at start:&nbsp;&nbsp;<span id="v_holdRec" style="opacity:.85;font-weight:300;"></span></div><div class="val" id="v_hold"></div></div>
+      <div class="rowHeader"><div class="label">Rest time at start:&nbsp;&nbsp;<span class="warning"><span id="v_holdRec" style="opacity:.85;font-weight:300;"></span></div><div class="val" id="v_hold"></span></div></div>
       <input id="holdTime" type="range" min="0" max="1000" step="5" value="300" />
     </div>
 
     <div class="row">
-      <div class="rowHeader"><div class="label">Game duration (min)</div><div class="val" id="v_gameMin"></div></div>
-      <input id="gameMin" type="range" min="5" max="120" step="5" value="45" />
+      <div class="rowHeader"><div class="label">Game duration <span class="warningthin">(shorter game = harder)</span></div><div class="val" id="v_gameMin"></div></div>
+      <input id="gameMin" type="range" min="5" max="120" step="5" value="20" />
     </div>
 
     <div class="row">
@@ -478,7 +480,7 @@
 
   <!-- Health HUD -->
   <div id="healthHud">
-    <img id="heartIcon" src="heart.png" alt="heart" />
+    <img id="heartIcon" src="assets/heart.png" alt="heart" />
     <div id="healthValue">100</div>
   </div>
 
@@ -544,11 +546,35 @@
 
 const v_holdRec = document.getElementById("v_holdRec");
 
-function fmtMinSec(totalSec){
-  const m = Math.floor(totalSec / 60);
-  const s = Math.round(totalSec % 60);
-  return s ? `${m}m ${s}s` : `${m}m`;
+
+// ===============================
+// SOUND SETUP (TEMP FILENAMES)
+// ===============================
+
+// One-shot sounds
+const sndStormMove = new Audio("assets/storm_move.mp3");     // storm starts moving
+const sndEliminated = new Audio("assets/eliminated.mp3");    // eliminated
+
+sndStormMove.preload = "auto";
+sndEliminated.preload = "auto";
+
+
+// ===============================
+// STORMS SURVIVED (LOCAL)
+// ===============================
+let stormsSurvived = 0;
+
+function stormsStorageKey(st){
+  return `stormcatch_storms_${st.seed}_${st.startedAtMs}`;
 }
+
+
+
+// State guards
+
+let lastPhaseKind = null;
+
+
 
 function recommendedHoldSecFromRadius(radiusM){
   // 1km -> 300s (5 min)
@@ -792,18 +818,26 @@ function setStartCenter(latlng){
       return L.latLng(lat + (north / metersPerDegLat), center.lng + (east / metersPerDegLng));
     }
 
-    // New: next center can be anywhere within the old circle (relaxed)
-    function chooseNextCenterRelaxed(currentCenter, currentR, rng, originCenter, originR) {
-	  // 1) propose inside current circle
-	  const candidate = randomPointInDiskMeters(currentCenter, currentR, rng);
+function chooseNextCenterReachable(currentCenter, currentR, rng, originCenter, originR) {
+  // Always reachable: must be inside current circle.
+  // Optional: also keep it within the original start circle.
+  const MAX_TRIES = 60;
 
-	  // 2) if it's inside the original circle, accept
-	  if (candidate.distanceTo(originCenter) <= originR) return candidate;
+  for (let i = 0; i < MAX_TRIES; i++) {
+    const cand = randomPointInDiskMeters(currentCenter, currentR, rng);
 
-	  // 3) otherwise, fall back to a point sampled directly inside the original circle
-	  // (keeps it simple + fully bounded)
-	  return randomPointInDiskMeters(originCenter, originR, rng);
-	}
+    // If you DON'T care about staying within the original circle, just:
+    // return cand;
+
+    // If you DO care:
+    if (cand.distanceTo(originCenter) <= originR) return cand;
+  }
+
+  // Fallback that still guarantees reachability:
+  // If we can't find an intersection point quickly, just stay put.
+  return L.latLng(currentCenter.lat, currentCenter.lng);
+}
+
 
     // ============================================================
     // State (v2): shrink-until-closed within a fixed game duration
@@ -815,8 +849,41 @@ function setStartCenter(latlng){
       const rng = mulberry32(st.seed);
 
       const playSec = Math.max(0, st.gameDurationSec - st.delaySec);
-      const cycleSec = st.holdSec + st.moveSec;
-      const moves = Math.max(1, Math.ceil(playSec / Math.max(1, cycleSec))); // cover the full duration
+
+function totalPlayTimeForMoves(movesCount){
+  // estimate radii progression with exponential shrink during MOVE time only
+  const totalMoveSec = movesCount * st.moveSec;
+  const r0 = st.baseRadiusM;
+  const rMin = Math.max(2, st.minRadiusM);
+  const k = Math.log(rMin / r0) / Math.max(1, totalMoveSec);
+
+  let tSum = 0;
+  for (let i = 0; i < movesCount; i++){
+    const movedSoFar = i * st.moveSec;
+    const rHere = Math.max(rMin, r0 * Math.exp(k * movedSoFar));
+    const holdHere = holdSecForRadius(st.holdSec, rHere, r0);
+    tSum += holdHere + st.moveSec;
+  }
+  return tSum;
+}
+
+// Start from nominal guess, then adjust up/down until it fits playSec
+let moves = Math.max(1, Math.ceil(playSec / Math.max(1, (st.holdSec + st.moveSec))));
+let tEst = totalPlayTimeForMoves(moves);
+
+// If our estimate is too short, we need MORE moves (more segments, gentler shrink)
+while (tEst < playSec * 0.98) { // 2% tolerance
+  moves++;
+  tEst = totalPlayTimeForMoves(moves);
+  if (moves > 2000) break; // safety
+}
+
+// If our estimate is too long, we need FEWER moves
+while (tEst > playSec * 1.02 && moves > 1) {
+  moves--;
+  tEst = totalPlayTimeForMoves(moves);
+}
+
 
       const totalMoveSec = moves * st.moveSec;
       const r0 = st.baseRadiusM;
@@ -836,7 +903,8 @@ function setStartCenter(latlng){
         const rEnd = Math.max(rMin, r0 * Math.exp(k * (movedSoFar + st.moveSec)));
 
         const originCenter = L.latLng(st.baseCenter.lat, st.baseCenter.lng);
-		const nextCenterLL = chooseNextCenterRelaxed(curCenter, rStart, rng, originCenter, st.baseRadiusM);
+const nextCenterLL = chooseNextCenterReachable(curCenter, rStart, rng, originCenter, st.baseRadiusM);
+
 
         circles.push({ center: { lat: nextCenterLL.lat, lng: nextCenterLL.lng }, radiusM: rEnd });
 
@@ -957,12 +1025,20 @@ return {
       health = val;
       healthValueEl.textContent = String(Math.round(health));
       if (health <= 0 && !eliminated) {
-        eliminated = true;
-        eliminatedAt = new Date();
+		  eliminated = true;
+		  eliminatedAt = new Date();
+
+		  sndEliminated.currentTime = 0;
+		  sndEliminated.play().catch(() => {});
 
         const tStr = eliminatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-        elimSmall.innerHTML = `You are now a catcher<br><span class="elimTime">Eliminated at ${tStr}</span>`;
+        elimSmall.innerHTML =
+  `You are now a catcher` +
+  `<br><span class="elimTime">Eliminated at ${tStr}</span>` +
+  `<br><span class="elimTime">Storms survived: ${stormsSurvived}</span>`;
 
+    document.getElementById("caughtBtn").style.display = "none";
+    document.getElementById("caughtConfirm")?.classList.add("caughtHidden");
 
         elimOverlay.style.display = "flex";
         elimFrame.style.display = "block";
@@ -1017,7 +1093,7 @@ caughtYes.addEventListener("click", () => {
     function makePickupIcon(value) {
       const html = `
         <div class="pickup">
-          <img src="heart.png" alt="heart">
+          <img src="assets/heart.png" alt="heart">
           <div class="val">${value}</div>
         </div>`;
       return L.divIcon({ html, className: "", iconSize: [38,38], iconAnchor:[19,19] });
@@ -1128,7 +1204,7 @@ caughtYes.addEventListener("click", () => {
       v_dps.textContent    = `${dpsEl.value} /s`;
 	  
 	  const rec = recommendedHoldSecFromRadius(Number(startRadiusEl.value));
-v_holdRec.textContent = `suggestion: ${Math.round(rec)} seconds.`;
+v_holdRec.textContent = `(suggestion: ${Math.round(rec)} seconds)`;
 
     }
     reflectSliderValues();
@@ -1242,6 +1318,18 @@ function enableHostPanel(){
 
       activeState.circles = buildSeededCircles(activeState);
       activeState.pickups = buildSeededPickups(activeState);
+	  
+	  
+	  // Restore storms survived
+		try {
+		  const saved = localStorage.getItem(stormsStorageKey(activeState));
+		  stormsSurvived = saved ? Number(saved) || 0 : 0;
+		} catch {
+		  stormsSurvived = 0;
+		}
+
+	  
+	  
 
       caughtBtn.style.display = "block";
 	  
@@ -1260,26 +1348,24 @@ function enableHostPanel(){
       updateStormMask(L.latLng(baseCenter.lat, baseCenter.lng), baseRadiusM);
       clearPreview();
 
-      // reset local health + elim visuals
-      eliminated = false;
-      eliminatedAt = null;
-      elimOverlay.style.display = "none";
-      elimFrame.style.display = "none";
-      setHealth(health <= 0 ? 100 : health); // ensure HUD updates
-      if (health <= 0) setHealth(100);
+// reset local health + elim visuals
+eliminated = false;
+eliminatedAt = null;
+elimOverlay.style.display = "none";
+elimFrame.style.display = "none";
+setHealth(100);
 
-      clearPickups();
+clearPickups();
 
-      return true;
+return true;
     }
 
     // ============================================================
     // Host Start -> generates seeded link (v2)
     // ============================================================
-    startBtn.onclick = () => {
+        startBtn.onclick = () => {
       if (!chosenStartCenter) return;
-if (activeState) caughtBtn.style.display = "block";
-  caughtBtn.style.display = "block";
+      caughtBtn.style.display = "block";
       isHostLocal = true;
 	
 	  
@@ -1308,6 +1394,13 @@ if (activeState) caughtBtn.style.display = "block";
 
       // Load state locally as host
       loadFromHash();
+
+		  // ✅ REMOVE HOST START CENTER MARKER
+		  if (startCenterMarker) {
+			map.removeLayer(startCenterMarker);
+			startCenterMarker = null;
+		  }
+
 
       copyBtn.disabled = false;
 	  shareBtn.disabled = false;
@@ -1379,11 +1472,6 @@ radiusSelectEl.style.display = "";
 
       setBigStatus("Waiting…", "", false);
 	  
-	  if (activeState) {
-		  try {
-			localStorage.removeItem(pickupStorageKey(activeState));
-		  } catch {}
-		}
     };
 
     // ============================================================
@@ -1414,11 +1502,41 @@ radiusSelectEl.style.display = "";
     // ============================================================
     function loop() {
       const t = Date.now();
+      
       const dt = Math.max(0, (t - lastTickMs) / 1000);
       lastTickMs = t;
 
       if (activeState) {
         const ph = computePhaseAtTimeV2(activeState, t);
+		
+		// ===============================
+		// STORM STARTS MOVING SOUND
+		// ===============================
+		if (lastPhaseKind === "holding" && ph.kind === "shrinking") {
+		  sndStormMove.currentTime = 0;
+		  sndStormMove.play().catch(() => {});
+		}
+
+		// ===============================
+		// STORM SURVIVED COUNT
+		// ===============================
+		if (
+		  activeState &&
+		  ph.kind === "holding" &&
+		  lastPhaseKind === "shrinking"
+		) {
+		  stormsSurvived++;
+
+		  try {
+			localStorage.setItem(
+			  stormsStorageKey(activeState),
+			  String(stormsSurvived)
+			);
+		  } catch {}
+		}
+
+		lastPhaseKind = ph.kind;
+
 
         if (ph?.center && typeof ph.radiusM === "number") {
           drawStorm(ph.center, ph.radiusM);
@@ -1447,9 +1565,15 @@ radiusSelectEl.style.display = "";
 		  setBigStatus("Storm is resting", `Moves in ${s}s`, false);
 
 		} else if (ph.kind === "shrinking") {
-		  setBigStatus("Storm is moving", "", false);
+  if (activeState && ph.radiusM <= activeState.minRadiusM + 0.5) {
+    setBigStatus("Storm is resting", "", false);
+  } else {
+    setBigStatus("Storm is moving", "", false);
+  }
+}
 
-		} else if (ph.kind === "finished") {
+    
+    else if (ph.kind === "finished") {
 		  setBigStatus("Game ended", "", false);
 		}
 
