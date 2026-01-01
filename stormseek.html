@@ -351,7 +351,7 @@
       content:"";
       position:absolute;
       top:0; bottom:0;
-      left: 46px;
+      left: 6px;
       width: 2px;
 	  
       
@@ -529,7 +529,7 @@
 
     @media (max-width: 420px){
       .dockBtn{ width: 58px; height: 58px; top: -72px; font-size: 10px; }
-      #notesCard::before{ left: 42px; }
+      
       .noteItem{ padding-left: 56px; }
       #foundOverlayInner{ top: 18vh; }
     }
@@ -668,7 +668,7 @@
       <div id="foundBody">
         <div id="foundForm">
           <input id="foundName" type="text" inputmode="text" autocomplete="off" placeholder="Name" />
-          <button id="addFound" type="button">Add to notepad</button>
+          <button id="addFound" type="button">Add</button>
         </div>
         <div id="foundHint">This creates a note like: “I found Alex at 14:32:10”.</div>
       </div>
@@ -683,9 +683,10 @@
     const v_holdRec = document.getElementById("v_holdRec");
 
     // ===============================
-    // SOUND SETUP (TEMP FILENAMES)
+    // SOUND SETUP 
     // ===============================
     const sndStormMove = new Audio("assets/storm_move.mp3");     // storm starts moving
+	sndStormMove.volume = 0.15; 
     const sndEliminated = new Audio("assets/eliminated.mp3");    // eliminated
     sndStormMove.preload = "auto";
     sndEliminated.preload = "auto";
@@ -1122,7 +1123,7 @@
         sndEliminated.currentTime = 0;
         sndEliminated.play().catch(() => {});
 
-        const tStr = eliminatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        const tStr = eliminatedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit",  hour12: "false"});
         elimSmall.innerHTML =
           `ELIMINATED BY STORM` +
           `<br><span class="elimTime">Eliminated at ${tStr}</span>` +
