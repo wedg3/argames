@@ -513,6 +513,7 @@
     
       if (!selfMarker) selfMarker = L.circleMarker(latlng, style).addTo(map);
       else selfMarker.setLatLng(latlng);
+      }
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
         (pos) => setSelfMarker([pos.coords.latitude, pos.coords.longitude]),
@@ -1302,4 +1303,5 @@
   </script>
 </body>
 </html>
+
 
