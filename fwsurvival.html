@@ -160,56 +160,136 @@
     }
 
     /* Fuel HUD (top right) */
-    #fuelHud{
+    #fuelHudOver{
       position: fixed;
       right: 10px;
-      top: 10px;
+      top: 5px;
+      z-index: 1400;
+      padding: 6px 3px;
+      color: #fff;
+        display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      min-width: auto;
+
+      user-select: none;
+      pointer-events: none;
+      
+    }
+
+    /* Fuel HUD (top right) */
+    #fuelHud{
+      
       z-index: 1100;
       background: rgba(0,0,0,.30);
-      border: 1px solid rgba(255,255,255,.55);
-      border-radius: 4px;
-      padding: 6px 10px;
+      border: 0px solid rgba(0, 0, 0, 0.9);
+      border-radius: 1px;
+      padding: 6px 3px;
       color: #fff;
-      display: flex;
+        display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 3px;
+      min-width: auto;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       user-select: none;
       pointer-events: none;
-      min-width: 170px;
+      
     }
     #fuelLabel{
-      font-size: 12px;
+      
+      font-size: 10px;
       font-weight: 900;
       opacity: .92;
       letter-spacing: .4px;
       text-transform: uppercase;
+              text-shadow:        -1px -1px 0 #000000,
+     1px -1px 0 #000000,
+    -1px  1px 0 #000000,
+     1px  1px 0 #000000;
+      
     }
-    #fuelValue{
-      font-size: 18px;
-      font-weight: 1000;
+
+        #fuelLabel2{
+      
+      font-size: 10px;
+      font-weight: 500;
+        text-shadow:        -1px -1px 0 #000000,
+     1px -1px 0 #000000,
+    -1px  1px 0 #000000,
+     1px  1px 0 #000000;
+
+      opacity: .92;
       letter-spacing: .4px;
-      margin-left: auto;
-      min-width: 44px;
-      text-align: right;
+      text-transform: uppercase;
+      padding:3px; 
+      
     }
+
+
+    
+    #fuelValue{
+
+  position: absolute;
+  inset: 0;                 /* fills the bar */
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .3px;
+
+  color: rgb(255, 39, 39);
+ 
+
+  pointer-events: none;
+  user-select: none;
+  z-index:2000;
+}
+
+                
+    
     #fuelBarWrap{
-      width: 100%;
-      height: 8px;
-      background: rgba(255,255,255,.18);
-      border: 1px solid rgba(255,255,255,.22);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-left: 8px;
+        position: relative;
+  width: 20px;
+  height: 100px;
+  background: rgba(99, 99, 99, 0.48);
+  border: 2px solid rgb(0, 0, 0);
+  border-radius: 3px;
+  overflow: hidden;
+      
     }
+
+
+
     #fuelBar{
-      height: 100%;
-      width: 100%;
-      background: rgba(255,255,255,.9);
-      transform-origin: left center;
-      transform: scaleX(1);
+        position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(105, 228, 68, 0.973);
+  transform-origin: bottom center;
+      transform: scaleY(1);
     }
+
+    /* 3 horizontal tick marks */
+.fuelTick{
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.85);
+  
+  pointer-events: none;
+}
+
+/* positions: 100/200/300 out of 400 => 25%, 50%, 75% */
+.fuelTick.t1{ bottom: 25%; }
+.fuelTick.t2{ bottom: 50%; }
+.fuelTick.t3{ bottom: 75%; }
 
     /* BIG STATUS */
     #bigStatus{
@@ -219,15 +299,15 @@
       transform: translateX(-50%);
       width: calc(100vw - 28px);
       max-width: 560px;
-      background: rgba(189, 7, 7, 0.35);
-      border: 1px solid rgba(255, 0, 0, 0.45);
+      background: rgba(160, 7, 7, 0.25);
+      border: 1px solid rgba(255, 0, 0, 0.05);
       border-radius: 4px;
       z-index: 1100;
       padding: 10px 12px;
       color: #fff;
       text-align: center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
       pointer-events: none;
       user-select: none;
     }
@@ -238,7 +318,9 @@
     }
     #bigStatus .sub{
       margin-top: 2px;
-      font-size: 13px;
+      font-size: 18px;
+	  font-weight: 700;
+      letter-spacing: .6px;
       opacity: .9;
       letter-spacing: .2px;
       min-height: 1.1em;
@@ -269,7 +351,7 @@
       font-size: clamp(34px, 8vw, 68px);
       font-weight: 1000;
       letter-spacing: 1px;
-      color: rgba(255, 60, 60, .50);
+      color: rgba(255, 60, 60, .20);
       text-shadow: 0 10px 40px rgba(0,0,0,.35);
     }
     #elimOverlay .small{
@@ -277,7 +359,7 @@
       font-size: clamp(14px, 3.3vw, 18px);
       letter-spacing: .4px;
       line-height: 1.25;
-      color: black;
+      color: rgba(0, 0, 0, .5);
     }
     #elimOverlay .elimTime{
       display: block;
@@ -303,10 +385,10 @@
       display: grid;
       place-items: center;
       border-radius: 14px;
-      background: rgba(0,0,0,.18);
+      /* background: rgba(0,0,0,.18);
       border: 1px solid rgba(255,255,255,.22);
       backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px); */
     }
     .pickup img{
       width: 26px; height: 26px;
@@ -315,9 +397,8 @@
     }
     .pickup .val{
       position: absolute;
-      bottom: 2px;
-      right: 4px;
-      font-size: 12px;
+
+      font-size: 10px;
       font-weight: 1000;
       color: rgba(255,255,255,.95);
       text-shadow: 0 2px 10px rgba(0,0,0,.6);
@@ -349,7 +430,7 @@
 
     <div class="row">
       <div class="rowHeader"><div class="label">Fuel drain in holes (per second)</div><div class="val" id="v_fuelDrain"></div></div>
-      <input id="fuelDrain" type="range" min="1" max="5" step="1" value="1" />
+      <input id="fuelDrain" type="range" min="1" max="5" step="1" value="3" />
     </div>
 
     <div class="row">
@@ -386,32 +467,47 @@
     <div class="grid">
       <div class="miniRow">
         <div class="rowHeader"><div class="label">Rectangle width (m)</div><div class="val" id="v_w"></div></div>
-        <input id="rectW" type="range" min="60" max="1400" step="10" value="260" />
+        <input id="rectW" type="range" min="100" max="5000" step="50" value="2000" />
       </div>
       <div class="miniRow">
         <div class="rowHeader"><div class="label">Rectangle height (m)</div><div class="val" id="v_h"></div></div>
-        <input id="rectH" type="range" min="60" max="1400" step="10" value="220" />
+        <input id="rectH" type="range" min="100" max="5000" step="50" value="2000" />
       </div>
       <div class="miniRow">
         <div class="rowHeader"><div class="label">Grid columns (X)</div><div class="val" id="v_nx"></div></div>
-        <input id="gridNx" type="range" min="2" max="30" step="1" value="10" />
+        <input id="gridNx" type="range" min="2" max="20" step="1" value="10" />
       </div>
       <div class="miniRow">
         <div class="rowHeader"><div class="label">Grid rows (Y)</div><div class="val" id="v_ny"></div></div>
-        <input id="gridNy" type="range" min="2" max="30" step="1" value="8" />
+        <input id="gridNy" type="range" min="2" max="20" step="1" value="10" />
       </div>
       <div class="miniRow" style="grid-column: 1 / -1;">
         <div class="rowHeader"><div class="label">Grid rotation (deg)</div><div class="val" id="v_rot"></div></div>
-        <input id="gridRot" type="range" min="-180" max="180" step="1" value="18" />
+        <input id="gridRot" type="range" min="-180" max="180" step="1" value="0" />
       </div>
     </div>
   </div>
 
+   <div id="fuelHudOver">
+<div id="fuelLabel2">Jet pack </div>
+
+
+
   <div id="fuelHud">
-    <div id="fuelLabel">Fuel</div>
-    <div id="fuelBarWrap"><div id="fuelBar"></div></div>
-    <div id="fuelValue">100</div>
+
+<div id="fuelLabel">400</div>
+<div id="fuelBarWrap">
+    <div id="fuelBar"></div>
+  <div id="fuelValue">100</div>
+    <div class="fuelTick t1"></div>
+  <div class="fuelTick t2"></div>
+  <div class="fuelTick t3"></div>
+</div>
+<div id="fuelLabel">0</div>
   </div>
+<div id="fuelLabel2">fuel</div>
+  </div>
+
 
   <div id="bigStatus">
     <div class="main" id="bsMain">Waiting…</div>
@@ -564,14 +660,15 @@
     const fuelValueEl = document.getElementById("fuelValue");
     const fuelBarEl = document.getElementById("fuelBar");
     let fuel = 100;
-    const FUEL_MAX = 200;
+    const FUEL_MAX = 400;
     const FUEL_START = 100;
 
     function setFuel(v){
       fuel = clamp(v, 0, FUEL_MAX);
       fuelValueEl.textContent = String(Math.round(fuel));
       const pct = clamp(fuel / FUEL_MAX, 0, 1);
-      fuelBarEl.style.transform = "scaleX(" + pct + ")";
+      fuelBarEl.style.transform = "scaleY(" + pct + ")";
+
       fuelBarEl.style.opacity = (fuel < 25 ? 0.75 : 0.95);
     }
     setFuel(FUEL_START);
@@ -630,9 +727,9 @@
     }
 
     function cellStyleFor(state){
-      if (state === 1) return { color: "rgba(255,255,255,.22)", weight: 1, fill: true, fillColor: "#ff2a2a", fillOpacity: 0.60, interactive:false };
+      if (state === 1) return { color: "rgba(255,255,255,.22)", weight: 1, fill: true, fillColor: "#ff2a2a", fillOpacity: 0.45, interactive:false };
       if (state === 2) return { color: "rgba(255,255,255,.08)", weight: 1, fill: true, fillColor: "#000000", fillOpacity: 0.25, interactive:false };
-      return { color: "rgba(0,0,0,.2)", weight: 1, fill: true, fillColor: "#ffffff", fillOpacity: 0.08, interactive:false };
+      return { color: "rgba(0,0,0,.1)", weight: 1, fill: true, fillColor: "#ffffff", fillOpacity: 0.08, interactive:false };
     }
 
     function buildGridPolys(st){
@@ -939,7 +1036,7 @@
       const html = `
         <div class="pickup">
           <img src="assets/jetpack.png" alt="fuel" onerror="this.remove(); this.parentElement.insertAdjacentHTML('afterbegin','<div style=&quot;font-size:18px;filter: drop-shadow(0 6px 12px rgba(0,0,0,.35));&quot;>⛽</div>');">
-          <div class="val">+${value}</div>
+          <div class="val">${value}</div>
         </div>`;
       return L.divIcon({ html: html, className: "", iconSize: [38,38], iconAnchor:[19,19] });
     }
@@ -961,10 +1058,10 @@
       const rng = mulberry32(st.seed ^ 0xA53C9E17);
 
       // ===== TUNE =====
-      const INITIAL_COUNT = 10;   // fuel pickups at game start
+      const INITIAL_COUNT = 4;   // fuel pickups at game start
       const SPAWN_EVERY_S = 20;   // interval spawn (like hearts)
-      const MAX_ACTIVE    = 16;   // cap active on map
-      const AMOUNTS       = [10, 10, 15, 15, 20, 25, 30];
+      const MAX_ACTIVE    = 12;   // cap active on map
+      const AMOUNTS       = [20, 40, 50, 50, 100, 25, 100];
       // =================
 
       st.pickupMaxActive = MAX_ACTIVE;
