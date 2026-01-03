@@ -1239,13 +1239,42 @@
       if (!isHostLocal && isGuestLinkPresent()) return;
       panel.classList.remove("hidden");
       showUiWrap.style.display = "none";
+	    syncAreaBarVisibility();
     }
     function hideHostPanel(){
       panel.classList.add("hidden");
       showUiWrap.style.display = "block";
+	    syncAreaBarVisibility();
     }
     hideUiBtn.onclick = hideHostPanel;
     showUiBtn.onclick = function(){ enableHostPanel(); };
+
+
+function syncAreaBarVisibility(){
+  // Never show once game has started
+  if (activeState){
+    areaBar.style.display = "none";
+    return;
+  }
+
+  // Only host (no guest link) can see it
+  if (isGuestLinkPresent()){
+    areaBar.style.display = "none";
+    return;
+  }
+
+  // Must have picked a center to show it
+  if (!chosenStartCenter){
+    areaBar.style.display = "none";
+    return;
+  }
+
+  // If panel is open, hide area bar. If panel hidden, show it.
+  const panelIsOpen = !panel.classList.contains("hidden");
+  areaBar.style.display = panelIsOpen ? "none" : "block";
+}
+
+
 
     const allSliders = [delaySecEl, warnSecEl, fuelDrainEl, rectWEl, rectHEl, gridNxEl, gridNyEl, gridRotEl];
     for (let i=0; i<allSliders.length; i++){
@@ -1267,7 +1296,7 @@
         });
       } else startCenterMarker.setLatLng(latlng);
 
-      areaBar.style.display = "block";
+      syncAreaBarVisibility();
       previewGridIfPossible();
       startBtn.disabled = !chosenStartCenter;
       showUiWrap.style.display = "block";
@@ -1327,6 +1356,7 @@
 
       setHashParams(params);
       loadFromHash();
+	  syncAreaBarVisibility();
 
       if (startCenterMarker) { map.removeLayer(startCenterMarker); startCenterMarker = null; }
       areaBar.style.display = "none";
