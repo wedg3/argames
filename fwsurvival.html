@@ -118,8 +118,8 @@
     }
     #areaBar .titleRow .t{
       font-weight: 1000;
-      letter-spacing: .4px;
-      font-size: 12px;
+      letter-spacing: .2px;
+      font-size: 11px;
       color: #111;
       text-transform: uppercase;
     }
@@ -299,7 +299,7 @@
       transform: translateX(-50%);
       width: calc(100vw - 28px);
       max-width: 560px;
-      background: rgba(160, 7, 7, 0.25);
+      background: rgba(160, 7, 7, 0.45);
       border: 1px solid rgba(255, 0, 0, 0.05);
       border-radius: 4px;
       z-index: 1100;
@@ -461,8 +461,9 @@
 
   <div id="areaBar">
     <div class="titleRow">
-      <div class="t">Area & Grid</div>
-      <div class="hint">Tap map to set center • Adjust while seeing the map</div>
+      <div class="t">1. Tap map and set up game area. </div>
+      <div class="t">2. "Show Menu" at the top.</div>
+     
     </div>
     <div class="grid">
       <div class="miniRow">
@@ -561,6 +562,8 @@
       location.hash = parts.join("&");
     }
 
+
+
     // ============================================================
     // Seeded RNG (Mulberry32)
     // ============================================================
@@ -587,7 +590,7 @@
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 16),
+        (pos) => map.setView([pos.coords.latitude, pos.coords.longitude], 14),
         () => {},
         { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
       );
@@ -598,7 +601,16 @@
     // ============================================================
     let selfMarker = null;
     function setSelfMarker(latlng){
-      const style = { radius: 10, color: "#990000", weight: 3, fill: true, fillColor: "#ff2a2a", fillOpacity: 1, opacity: 1 };
+        const style = {
+    radius: 8,
+    color: "#990000",     // outline
+    weight: 3,
+    fill: true,
+    fillColor: "#00c8ff", //fill
+    fillOpacity: 0.9,
+    opacity: 0.9
+  };
+
       if (!selfMarker) selfMarker = L.circleMarker(latlng, style).addTo(map);
       else selfMarker.setLatLng(latlng);
     }
@@ -652,6 +664,8 @@
       elimOverlay.style.display = "flex";
       elimFrame.style.display = "block";
       setBigStatus("ELIMINATED", reason || "", true);
+
+      if (activeState) savePlayerState(activeState);
     }
 
     // ============================================================
@@ -661,6 +675,9 @@
     const fuelBarEl = document.getElementById("fuelBar");
     let fuel = 100;
     const FUEL_MAX = 400;
+
+let activeState = null;
+
     const FUEL_START = 100;
 
     function setFuel(v){
@@ -670,6 +687,7 @@
       fuelBarEl.style.transform = "scaleY(" + pct + ")";
 
       fuelBarEl.style.opacity = (fuel < 25 ? 0.75 : 0.95);
+      if (activeState) savePlayerState(activeState);
     }
     setFuel(FUEL_START);
 
@@ -887,6 +905,30 @@
       return true;
     }
 
+
+function savePlayerState(st){
+  if (!st) return;
+  try {
+    localStorage.setItem(playerStateKey(st), JSON.stringify({
+      eliminated,
+      eliminatedAtMs: eliminatedAt ? eliminatedAt.getTime() : null,
+      eliminatedReason: eliminated ? (elimSmall.textContent || "") : null,
+      fuel,
+      fallsSurvived,
+      joinedAtMs: st.joinedAtMs || null
+    }));
+  } catch {}
+}
+
+function loadPlayerState(st){
+  try {
+    const raw = localStorage.getItem(playerStateKey(st));
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+
     // ============================================================
     // Falling selection (combined removal connectivity fix)
     // ============================================================
@@ -1046,6 +1088,11 @@
       pickupMarkers.clear();
       collectedPickupIds.clear();
     }
+
+function playerStateKey(st){
+  return "fallingworld_player_" + st.seed + "_" + st.startedAtMs;
+}
+
 
     function pickupsStorageKey(st){
       return "fallingworld_pickups_" + st.seed + "_" + st.startedAtMs;
@@ -1214,7 +1261,6 @@
     let startCenterMarker = null;
     let chosenStartCenter = null;
 
-    let activeState = null;
     let isHostLocal = false;
 
     function isGuestLinkPresent() {
@@ -1442,12 +1488,22 @@
       activeState.safeSet = new Set();
       for (let i=0; i<total; i++) activeState.safeSet.add(i);
 
+      activeState.joinedAtMs = Date.now(); // default: first time this player joins
+      const savedPS = loadPlayerState(activeState);
+      if (savedPS && Number.isFinite(savedPS.joinedAtMs)) {
+        activeState.joinedAtMs = savedPS.joinedAtMs;
+      }
+
+
       // Restore falls survived
       try {
         const saved = localStorage.getItem(fallsStorageKey(activeState));
         fallsSurvived = saved ? (Number(saved) || 0) : 0;
       } catch { fallsSurvived = 0; }
 
+
+
+      
       // Restore collected pickups
       try {
         const saved = JSON.parse(localStorage.getItem(pickupsStorageKey(activeState)) || "[]");
@@ -1457,17 +1513,48 @@
       // Rebuild pickups schedule
       activeState.pickups = buildSeededPickups(activeState);
 
-      // Reset elimination + fuel
-      eliminated = false;
-      eliminatedAt = null;
-      elimOverlay.style.display = "none";
-      elimFrame.style.display = "none";
-      setFuel(FUEL_START);
+const ps = loadPlayerState(activeState);
+if (ps){
+  if (Number.isFinite(ps.fuel)) setFuel(ps.fuel);
+  if (Number.isFinite(ps.fallsSurvived)) fallsSurvived = ps.fallsSurvived;
+
+  if (ps.eliminated){
+    // restore eliminated UI without “reviving”
+    eliminated = true;
+    eliminatedAt = ps.eliminatedAtMs ? new Date(ps.eliminatedAtMs) : new Date();
+
+    // show overlay/frame and status; skip sound by not calling eliminate()
+    const tStr = eliminatedAt.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+    const reason = ps.eliminatedReason || "You are out";
+
+    elimSmall.innerHTML =
+      reason
+      + `<br><span class="elimTime">Eliminated at ${tStr}</span>`
+      + `<br><span class="elimTime">Falls survived: ${fallsSurvived}</span>`;
+
+    elimOverlay.style.display = "flex";
+    elimFrame.style.display = "block";
+    setBigStatus("ELIMINATED", reason, true);
+  } else {
+    eliminated = false;
+    eliminatedAt = null;
+    elimOverlay.style.display = "none";
+    elimFrame.style.display = "none";
+  }
+} else {
+  // no saved player state -> normal start
+  eliminated = false;
+  eliminatedAt = null;
+  elimOverlay.style.display = "none";
+  elimFrame.style.display = "none";
+  setFuel(FUEL_START);
+}
+
 
       // Clear old markers; existing pickup IDs in storage will prevent re-collect
       clearPickups();
 
-      map.setView([baseCenter.lat, baseCenter.lng], 17);
+      map.setView([baseCenter.lat, baseCenter.lng], 14);
 
       return true;
     }
@@ -1494,7 +1581,7 @@
       applyCellStyles();
     }
 
-    function applyFall(st){
+    function applyFall(st, nowMs){
       const toFall = st.activeFallSet || [];
       let fellAny = false;
 
@@ -1507,9 +1594,14 @@
       }
 
       if (fellAny){
-        fallsSurvived++;
-        try { localStorage.setItem(fallsStorageKey(st), String(fallsSurvived)); } catch {}
-      }
+  // Only count as "survived" if you were alive when it happened,
+  // and you had already joined before the fall.
+  if (!eliminated && (!st.joinedAtMs || nowMs >= st.joinedAtMs)){
+    fallsSurvived++;
+    if (activeState) savePlayerState(activeState);
+    try { localStorage.setItem(fallsStorageKey(st), String(fallsSurvived)); } catch {}
+  }
+}
 
       applyCellStyles();
     }
@@ -1549,7 +1641,7 @@
   if (st.lastAppliedCycle !== ph.cycleIndex || lastPhaseKind !== "warning"){
     // If we already had a previous cycle, drop its selected cells now.
     if (st.lastAppliedCycle >= 0 && st.activeFallSet && st.activeFallSet.length){
-      applyFall(st); // turns those red cells into holes immediately
+      applyFall(st, t); // turns those red cells into holes immediately
     }
 
     st.lastAppliedCycle = ph.cycleIndex;
