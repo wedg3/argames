@@ -1073,7 +1073,7 @@
     function buildSeededPickups(st){
       const rng = mulberry32(st.seed ^ 0xA53C9E17);
 
-      const INITIAL_COUNT = 4;
+      const INITIAL_COUNT = 7;
       const SPAWN_EVERY_S = 20;
       const MAX_ACTIVE    = 12;
       const AMOUNTS       = [20, 40, 50, 50, 100, 25, 100];
@@ -1148,7 +1148,7 @@
 
       if (!myLatLngOrNull) return;
 
-      const PICKUP_RADIUS_M = 12;
+      const PICKUP_RADIUS_M = 50;
 
       for (let i=0; i<st.pickups.length; i++){
         const p = st.pickups[i];
